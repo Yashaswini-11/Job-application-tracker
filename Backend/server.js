@@ -1,4 +1,4 @@
-
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
@@ -10,9 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB Connection
-mongoose.connect(
-  "mongodb://Jobtrackeruser:Jungkook01@ac-8wg9k8w-shard-00-00.zcfyohz.mongodb.net:27017,ac-8wg9k8w-shard-00-01.zcfyohz.mongodb.net:27017,ac-8wg9k8w-shard-00-02.zcfyohz.mongodb.net:27017/?ssl=true&replicaSet=atlas-11kfvz-shard-0&authSource=admin&appName=Cluster0"
-)
+mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log("MongoDB Connected"))
 .catch((err) => console.log("Mongo Error:", err));
 
