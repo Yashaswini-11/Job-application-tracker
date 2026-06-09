@@ -7,7 +7,7 @@ form.addEventListener("submit", async function (event) {
     const role = document.getElementById("role").value;
     const status = document.getElementById("status").value;
 
-    const response = await fetch("http://localhost:5000/jobs", {
+    const response = await fetch("https://job-application-backend-syrb.onrender.com/jobs", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -32,7 +32,7 @@ form.addEventListener("submit", async function (event) {
 
 async function loadJobs() {
 
-    const response = await fetch("http://localhost:5000/jobs");
+    const response = await fetch("https://job-application-backend-syrb.onrender.com/jobs");
 
     const jobs = await response.json();
 
@@ -70,7 +70,7 @@ async function loadJobs() {
 
 async function deleteJob(id) {
 
-    await fetch(`http://localhost:5000/jobs/${id}`, {
+    await fetch(`https://job-application-backend-syrb.onrender.com/jobs/${id}`, {
         method: "DELETE"
     });
 
@@ -79,13 +79,13 @@ async function deleteJob(id) {
 
 async function updateStatus(id, status) {
 
-    const response = await fetch("http://localhost:5000/jobs");
+    const response = await fetch("https://job-application-backend-syrb.onrender.com/jobs");
 
     const jobs = await response.json();
 
     const job = jobs.find(job => job._id === id);
 
-    await fetch(`http://localhost:5000/jobs/${id}`, {
+    await fetch(`https://job-application-backend-syrb.onrender.com/jobs/${id}`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json"
