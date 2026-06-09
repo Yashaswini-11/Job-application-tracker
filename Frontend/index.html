@@ -50,7 +50,32 @@
         </button>
 
     </form>
+    <div id="stats">
+    <h3>Total Applications: <span id="totalCount">0</span></h3>
+    <h3>Applied: <span id="appliedCount">0</span></h3>
+    <h3>Interview Scheduled: <span id="interviewCount">0</span></h3>
+    <h3>Rejected: <span id="rejectedCount">0</span></h3>
+    <h3>Offer Received: <span id="offerCount">0</span></h3>
+    </div>
+    <input
+    type="text"
+    id="searchInput"
+    placeholder="Search by company..."
+    onkeyup="loadJobs()"
+>
 
+<select id="filterStatus" onchange="loadJobs()">
+    <option value="All">All Status</option>
+    <option value="Applied">Applied</option>
+    <option value="Interview Scheduled">Interview Scheduled</option>
+    <option value="Rejected">Rejected</option>
+    <option value="Offer Received">Offer Received</option>
+</select>
+
+<hr>
+
+<div id="applications"></div>
+    
     <div id="applications">
 
     </div>

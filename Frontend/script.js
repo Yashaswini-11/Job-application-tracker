@@ -1,13 +1,14 @@
 const form = document.getElementById("jobForm");
 
 form.addEventListener("submit", async function (event) {
+
     event.preventDefault();
 
     const company = document.getElementById("company").value;
     const role = document.getElementById("role").value;
     const status = document.getElementById("status").value;
 
-    const response = await fetch("https://job-application-backend-syrb.onrender.com/jobs", {
+    await fetch("https://job-application-backend-syrb.onrender.com/jobs", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -19,10 +20,6 @@ form.addEventListener("submit", async function (event) {
         })
     });
 
-    const data = await response.json();
-
-    console.log(data);
-
     alert("Job Added Successfully");
 
     form.reset();
@@ -32,15 +29,65 @@ form.addEventListener("submit", async function (event) {
 
 async function loadJobs() {
 
-    const response = await fetch("https://job-application-backend-syrb.onrender.com/jobs");
+    const response = await fetch(
+        "https://job-application-backend-syrb.onrender.com/jobs"
+    );
 
     const jobs = await response.json();
 
-    const applicationDiv = document.getElementById("applications");
+    // Dashboard Statistics
+    document.getElementById("totalCount").textContent =
+        jobs.length;
+
+    document.getElementById("appliedCount").textContent =
+        jobs.filter(job => job.status === "Applied").length;
+
+    document.getElementById("interviewCount").textContent =
+        jobs.filter(
+            job => job.status === "Interview Scheduled"
+        ).length;
+
+    document.getElementById("rejectedCount").textContent =
+        jobs.filter(
+            job => job.status === "Rejected"
+        ).length;
+
+    document.getElementById("offerCount").textContent =
+        jobs.filter(
+            job => job.status === "Offer Received"
+        ).length;
+
+    // Search
+    const searchText =
+        document.getElementById("searchInput")
+        .value
+        .toLowerCase();
+
+    // Filter
+    const selectedStatus =
+        document.getElementById("filterStatus")
+        .value;
+
+    const filteredJobs = jobs.filter(job => {
+
+        const matchesSearch =
+            job.company
+            .toLowerCase()
+            .includes(searchText);
+
+        const matchesStatus =
+            selectedStatus === "All" ||
+            job.status === selectedStatus;
+
+        return matchesSearch && matchesStatus;
+    });
+
+    const applicationDiv =
+        document.getElementById("applications");
 
     applicationDiv.innerHTML = "";
 
-    jobs.forEach(job => {
+    filteredJobs.forEach(job => {
 
         const card = document.createElement("div");
 
@@ -52,9 +99,18 @@ async function loadJobs() {
 
             <select onchange="updateStatus('${job._id}', this.value)">
                 <option value="Applied" ${job.status === "Applied" ? "selected" : ""}>Applied</option>
-                <option value="Interview Scheduled" ${job.status === "Interview Scheduled" ? "selected" : ""}>Interview Scheduled</option>
-                <option value="Rejected" ${job.status === "Rejected" ? "selected" : ""}>Rejected</option>
-                <option value="Offer Received" ${job.status === "Offer Received" ? "selected" : ""}>Offer Received</option>
+
+                <option value="Interview Scheduled" ${job.status === "Interview Scheduled" ? "selected" : ""}>
+                    Interview Scheduled
+                </option>
+
+                <option value="Rejected" ${job.status === "Rejected" ? "selected" : ""}>
+                    Rejected
+                </option>
+
+                <option value="Offer Received" ${job.status === "Offer Received" ? "selected" : ""}>
+                    Offer Received
+                </option>
             </select>
 
             <br><br>
@@ -70,32 +126,51 @@ async function loadJobs() {
 
 async function deleteJob(id) {
 
-    await fetch(`https://job-application-backend-syrb.onrender.com/jobs/${id}`, {
-        method: "DELETE"
-    });
+    const confirmDelete =
+        confirm(
+            "Are you sure you want to delete this application?"
+        );
+
+    if (!confirmDelete) {
+        return;
+    }
+
+    await fetch(
+        `https://job-application-backend-syrb.onrender.com/jobs/${id}`,
+        {
+            method: "DELETE"
+        }
+    );
 
     loadJobs();
 }
 
 async function updateStatus(id, status) {
 
-    const response = await fetch("https://job-application-backend-syrb.onrender.com/jobs");
+    const response = await fetch(
+        "https://job-application-backend-syrb.onrender.com/jobs"
+    );
 
     const jobs = await response.json();
 
-    const job = jobs.find(job => job._id === id);
+    const job = jobs.find(
+        job => job._id === id
+    );
 
-    await fetch(`https://job-application-backend-syrb.onrender.com/jobs/${id}`, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            company: job.company,
-            role: job.role,
-            status: status
-        })
-    });
+    await fetch(
+        `https://job-application-backend-syrb.onrender.com/jobs/${id}`,
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                company: job.company,
+                role: job.role,
+                status: status
+            })
+        }
+    );
 
     loadJobs();
 }
