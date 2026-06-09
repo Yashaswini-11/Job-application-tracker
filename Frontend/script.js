@@ -1,7 +1,6 @@
 const form = document.getElementById("jobForm");
 
-form.addEventListener("submit", async function(event) {
-
+form.addEventListener("submit", async function (event) {
     event.preventDefault();
 
     const company = document.getElementById("company").value;
@@ -20,12 +19,15 @@ form.addEventListener("submit", async function(event) {
         })
     });
 
-    alert(await response.text());
+    const data = await response.json();
+
+    console.log(data);
+
+    alert("Job Added Successfully");
 
     form.reset();
 
     loadJobs();
-
 });
 
 async function loadJobs() {
@@ -34,37 +36,36 @@ async function loadJobs() {
 
     const jobs = await response.json();
 
-    const applicationDiv =
-        document.getElementById("applications");
+    const applicationDiv = document.getElementById("applications");
 
     applicationDiv.innerHTML = "";
 
-    for (let i = 0; i < jobs.length; i++) {
+    jobs.forEach(job => {
 
         const card = document.createElement("div");
 
         card.classList.add("card");
 
         card.innerHTML = `
-            <h3>${jobs[i].company}</h3>
-            <p>${jobs[i].role}</p>
+            <h3>${job.company}</h3>
+            <p>${job.role}</p>
 
-            <select onchange="updateStatus(${jobs[i].id}, this.value)">
-                <option value="Applied" ${jobs[i].status === "Applied" ? "selected" : ""}>Applied</option>
-                <option value="Interview Scheduled" ${jobs[i].status === "Interview Scheduled" ? "selected" : ""}>Interview Scheduled</option>
-                <option value="Rejected" ${jobs[i].status === "Rejected" ? "selected" : ""}>Rejected</option>
-                <option value="Offer Received" ${jobs[i].status === "Offer Received" ? "selected" : ""}>Offer Received</option>
+            <select onchange="updateStatus('${job._id}', this.value)">
+                <option value="Applied" ${job.status === "Applied" ? "selected" : ""}>Applied</option>
+                <option value="Interview Scheduled" ${job.status === "Interview Scheduled" ? "selected" : ""}>Interview Scheduled</option>
+                <option value="Rejected" ${job.status === "Rejected" ? "selected" : ""}>Rejected</option>
+                <option value="Offer Received" ${job.status === "Offer Received" ? "selected" : ""}>Offer Received</option>
             </select>
 
             <br><br>
 
-            <button onclick="deleteJob(${jobs[i].id})">
+            <button onclick="deleteJob('${job._id}')">
                 Delete
             </button>
         `;
 
         applicationDiv.appendChild(card);
-    }
+    });
 }
 
 async function deleteJob(id) {
@@ -82,7 +83,7 @@ async function updateStatus(id, status) {
 
     const jobs = await response.json();
 
-    const job = jobs.find(job => job.id === id);
+    const job = jobs.find(job => job._id === id);
 
     await fetch(`http://localhost:5000/jobs/${id}`, {
         method: "PUT",

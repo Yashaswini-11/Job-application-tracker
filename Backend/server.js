@@ -37,7 +37,7 @@ app.get("/jobs", async (req, res) => {
 
 // POST new job
 app.post("/jobs", async (req, res) => {
-    res.send("yashaswini test");
+
     try {
 
         console.log("BODY:", req.body);
