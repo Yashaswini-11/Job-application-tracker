@@ -3,12 +3,6 @@ const token = localStorage.getItem("token");
 if (!token) {
     window.location.href = "login.html";
 }
-function logout() {
-
-    localStorage.removeItem("token");
-
-    window.location.href = "login.html";
-}
 
 const form = document.getElementById("jobForm");
 
@@ -53,6 +47,13 @@ async function loadJobs() {
             }
         }
     );
+
+    console.log("STATUS:", response.status);
+
+if (response.status === 401) {
+    alert("401 Unauthorized");
+    return;
+}
 
     const jobs = await response.json();
 
@@ -117,18 +118,9 @@ async function loadJobs() {
 
             <select onchange="updateStatus('${job._id}', this.value)">
                 <option value="Applied" ${job.status === "Applied" ? "selected" : ""}>Applied</option>
-
-                <option value="Interview Scheduled" ${job.status === "Interview Scheduled" ? "selected" : ""}>
-                    Interview Scheduled
-                </option>
-
-                <option value="Rejected" ${job.status === "Rejected" ? "selected" : ""}>
-                    Rejected
-                </option>
-
-                <option value="Offer Received" ${job.status === "Offer Received" ? "selected" : ""}>
-                    Offer Received
-                </option>
+                <option value="Interview Scheduled" ${job.status === "Interview Scheduled" ? "selected" : ""}>Interview Scheduled</option>
+                <option value="Rejected" ${job.status === "Rejected" ? "selected" : ""}>Rejected</option>
+                <option value="Offer Received" ${job.status === "Offer Received" ? "selected" : ""}>Offer Received</option>
             </select>
 
             <br><br>
@@ -148,9 +140,7 @@ async function deleteJob(id) {
         "Are you sure you want to delete this application?"
     );
 
-    if (!confirmDelete) {
-        return;
-    }
+    if (!confirmDelete) return;
 
     await fetch(
         `https://job-application-backend-syrb.onrender.com/jobs/${id}`,
@@ -199,6 +189,14 @@ async function updateStatus(id, status) {
     );
 
     loadJobs();
+}
+
+function logout() {
+
+    localStorage.removeItem("token");
+
+    window.location.href =
+        "login.html";
 }
 
 loadJobs();
