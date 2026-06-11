@@ -1,4 +1,5 @@
 
+const auth = require("./middleware/auth");
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -26,7 +27,8 @@ mongoose.connect(process.env.MONGO_URI)
 const jobSchema = new mongoose.Schema({
     company: String,
     role: String,
-    status: String
+    status: String,
+    userId: String
 });
 
 // Model
@@ -72,11 +74,64 @@ app.post("/register", async (req, res) => {
     }
 
 });
+app.post("/login", async (req, res) => {
 
-// GET all jobs
-app.get("/jobs", async (req, res) => {
+    console.log("LOGIN HIT");
+    console.log(req.body);
+
     try {
-        const jobs = await Job.find();
+
+        const { email, password } = req.body;
+
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(400).json({
+                message: "Invalid Email"
+            });
+        }
+
+        const isMatch = await bcrypt.compare(
+            password,
+            user.password
+        );
+
+        if (!isMatch) {
+            return res.status(400).json({
+                message: "Invalid Password"
+            });
+        }
+
+        const token = jwt.sign(
+            {
+                userId: user._id
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "7d"
+            }
+        );
+
+        res.json({
+            token
+        });
+
+    } catch (error) {
+
+        console.log(error);
+
+        res.status(500).json({
+            message: "Server Error"
+        });
+
+    }
+});
+// GET all jobs
+app.get("/jobs", auth, async (req, res) => {
+    try {
+        const jobs = await Job.find(
+            {userId:req.user.userId}
+        );
         res.json(jobs);
     } catch (error) {
         console.log(error);
@@ -85,7 +140,7 @@ app.get("/jobs", async (req, res) => {
 });
 
 // POST new job
-app.post("/jobs", async (req, res) => {
+app.post("/jobs", auth, async (req, res) => {
 
     try {
 
@@ -94,7 +149,8 @@ app.post("/jobs", async (req, res) => {
         const job = await Job.create({
             company: req.body.company,
             role: req.body.role,
-            status: req.body.status
+            status: req.body.status,
+            userId:req.user.userId
         });
 
         console.log("SAVED JOB:", job);
@@ -112,7 +168,7 @@ app.post("/jobs", async (req, res) => {
 });
 
 // PUT update job
-app.put("/jobs/:id", async (req, res) => {
+app.put("/jobs/:id",auth, async (req, res) => {
     try {
 
         console.log("ID:", req.params.id);
@@ -149,7 +205,7 @@ app.put("/jobs/:id", async (req, res) => {
 });
 
 // DELETE job
-app.delete("/jobs/:id", async (req, res) => {
+app.delete("/jobs/:id",auth, async (req, res) => {
     try {
 
         await Job.findByIdAndDelete(req.params.id);

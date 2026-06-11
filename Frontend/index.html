@@ -6,81 +6,98 @@
 </head>
 
 <body>
+<div class="container">
 
-    <h1>Job Application Tracker</h1>
+    <div class="sidebar">
 
-    <form id="jobForm">
+        <h2>Job Tracker</h2>
 
-        <input
-            type="text"
-            id="company"
-            placeholder="Company Name"
-            required
-        >
+        <div class="stat-box">
+            <h3>Total</h3>
+            <p id="totalCount">0</p>
+        </div>
 
-        <input
-            type="text"
-            id="role"
-            placeholder="Job Role"
-            required
-        >
+        <div class="stat-box">
+            <h3>Applied</h3>
+            <p id="appliedCount">0</p>
+        </div>
 
-        <select id="status">
+        <div class="stat-box">
+            <h3>Interview</h3>
+            <p id="interviewCount">0</p>
+        </div>
 
-            <option value="Applied">
-                Applied
-            </option>
+        <div class="stat-box">
+            <h3>Rejected</h3>
+            <p id="rejectedCount">0</p>
+        </div>
 
-            <option value="Interview Scheduled">
-                Interview Scheduled
-            </option>
+        <div class="stat-box">
+            <h3>Offers</h3>
+            <p id="offerCount">0</p>
+        </div>
 
-            <option value="Rejected">
-                Rejected
-            </option>
-
-            <option value="Offer Received">
-                Offer Received
-            </option>
-
-        </select>
-
-        <button type="submit">
-            Add Application
+        <button id="logoutBtn" onclick="logout()">
+            Logout
         </button>
 
-    </form>
-    <div id="stats">
-    <h3>Total Applications: <span id="totalCount">0</span></h3>
-    <h3>Applied: <span id="appliedCount">0</span></h3>
-    <h3>Interview Scheduled: <span id="interviewCount">0</span></h3>
-    <h3>Rejected: <span id="rejectedCount">0</span></h3>
-    <h3>Offer Received: <span id="offerCount">0</span></h3>
-    </div>
-    <input
-    type="text"
-    id="searchInput"
-    placeholder="Search by company..."
-    onkeyup="loadJobs()"
->
-
-<select id="filterStatus" onchange="loadJobs()">
-    <option value="All">All Status</option>
-    <option value="Applied">Applied</option>
-    <option value="Interview Scheduled">Interview Scheduled</option>
-    <option value="Rejected">Rejected</option>
-    <option value="Offer Received">Offer Received</option>
-</select>
-
-<hr>
-
-<div id="applications"></div>
-    
-    <div id="applications">
-
     </div>
 
-    <script src="script.js"></script>
+    <div class="main-content">
+
+        <h1>Job Application Tracker</h1>
+
+        <form id="jobForm">
+
+            <input
+                type="text"
+                id="company"
+                placeholder="Company Name"
+                required
+            >
+
+            <input
+                type="text"
+                id="role"
+                placeholder="Job Role"
+                required
+            >
+
+            <select id="status">
+                <option value="Applied">Applied</option>
+                <option value="Interview Scheduled">Interview Scheduled</option>
+                <option value="Rejected">Rejected</option>
+                <option value="Offer Received">Offer Received</option>
+            </select>
+
+            <button type="submit">
+                Add Application
+            </button>
+
+        </form>
+
+        <input
+            type="text"
+            id="searchInput"
+            placeholder="Search by company..."
+            onkeyup="loadJobs()"
+        >
+
+        <select id="filterStatus" onchange="loadJobs()">
+            <option value="All">All Status</option>
+            <option value="Applied">Applied</option>
+            <option value="Interview Scheduled">Interview Scheduled</option>
+            <option value="Rejected">Rejected</option>
+            <option value="Offer Received">Offer Received</option>
+        </select>
+
+        <div id="applications"></div>
+
+    </div>
+
+</div>
+
+<script src="script.js"></script>
 
 </body>
 </html>
