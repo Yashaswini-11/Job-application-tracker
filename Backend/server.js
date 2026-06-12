@@ -13,9 +13,7 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.get("/hello", (req, res) => {
-    res.send("HELLO");
-});
+
 
 
 // MongoDB Connection
