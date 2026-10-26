@@ -1,148 +1,310 @@
+
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <title>Login</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Job Application Tracker | Login</title>
 
-    <style>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-        body{
-            font-family: Arial, sans-serif;
-            background: #f5f7fb;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
 
-        .login-box{
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            width: 350px;
-            text-align: center;
-        }
+    .login-box {
+      background: white;
+      padding: 35px;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+      width: 100%;
+      max-width: 475px;
+      text-align: center;
+    }
 
-        h1{
-            margin-bottom: 20px;
-        }
+    h1 {
+      margin: 0 0 10px;
+      color: #111827;
+      font-size: 38px;
+    }
 
-        input{
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
-        }
+    .subtitle {
+      color: #64748b;
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
 
-        button{
-            width: 100%;
-            padding: 12px;
-            background: #2563eb;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-        }
+    input {
+      width: 100%;
+      padding: 15px;
+      margin-bottom: 17px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 16px;
+      outline: none;
+    }
 
-        button:hover{
-            background: #1d4ed8;
-        }
+    input:focus {
+      border-color: #2563eb;
+    }
 
-    </style>
+    button {
+      width: 100%;
+      padding: 15px;
+      margin-top: 20px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 18px;
+    }
 
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .switch-text {
+      margin-top: 24px;
+      color: #334155;
+    }
+
+    .switch-text a {
+      color: #2563eb;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    #message {
+      margin-top: 15px;
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    .error {
+      color: #dc2626;
+    }
+
+    .success {
+      color: #15803d;
+    }
+  </style>
 </head>
 
 <body>
+  <div class="login-box">
+    <h1 id="heading">Login</h1>
 
-    <div class="login-box">
+    <p class="subtitle" id="subtitle">
+      Sign in to manage your job applications.
+    </p>
 
-        <h1>Login</h1>
+    <form id="authForm">
+      <input
+        type="text"
+        id="name"
+        placeholder="Your name"
+        autocomplete="name"
+        minlength="2"
+        hidden
+      >
 
-        <input
-            type="email"
-            id="email"
-            placeholder="Enter Email"
-        >
+      <input
+        type="email"
+        id="email"
+        placeholder="Email address"
+        autocomplete="email"
+        required
+      >
 
-        <input
-            type="password"
-            id="password"
-            placeholder="Enter Password"
-        >
+      <input
+        type="password"
+        id="password"
+        placeholder="Password (minimum 6 characters)"
+        autocomplete="current-password"
+        minlength="6"
+        required
+      >
 
-        <button onclick="login()">
-            Login
-        </button>
+      <button type="submit" id="submitButton">Login</button>
+    </form>
 
-    </div>
+    <p id="message" role="status"></p>
 
-    <script>
+    <p class="switch-text">
+      <span id="switchPrompt">Don't have an account?</span>
+      <a href="#" id="switchLink">Register</a>
+    </p>
+  </div>
 
-        if (localStorage.getItem("token")) {
-            window.location.href = "index.html";
+  <script>
+    const API_URL =
+      "https://job-application-backend-syrb.onrender.com";
+
+    const form = document.getElementById("authForm");
+    const nameInput = document.getElementById("name");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const heading = document.getElementById("heading");
+    const subtitle = document.getElementById("subtitle");
+    const submitButton = document.getElementById("submitButton");
+    const switchPrompt = document.getElementById("switchPrompt");
+    const switchLink = document.getElementById("switchLink");
+    const message = document.getElementById("message");
+
+    let isRegistering = false;
+
+    if (localStorage.getItem("token")) {
+      window.location.replace("index.html");
+    }
+
+    function showMessage(text, type = "error") {
+      message.textContent = text;
+      message.className = type;
+    }
+
+    switchLink.addEventListener("click", function (event) {
+      event.preventDefault();
+
+      isRegistering = !isRegistering;
+      form.reset();
+      showMessage("");
+
+      nameInput.hidden = !isRegistering;
+      nameInput.required = isRegistering;
+
+      passwordInput.autocomplete = isRegistering
+        ? "new-password"
+        : "current-password";
+
+      heading.textContent = isRegistering ? "Register" : "Login";
+
+      subtitle.textContent = isRegistering
+        ? "Create an account to track your job applications."
+        : "Sign in to manage your job applications.";
+
+      submitButton.textContent = isRegistering
+        ? "Create Account"
+        : "Login";
+
+      switchPrompt.textContent = isRegistering
+        ? "Already have an account?"
+        : "Don't have an account?";
+
+      switchLink.textContent = isRegistering ? "Login" : "Register";
+    });
+
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      showMessage("");
+
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      if (password.length < 6) {
+        showMessage("Password must contain at least 6 characters.");
+        return;
+      }
+
+      const payload = { email, password };
+
+      if (isRegistering) {
+        const name = nameInput.value.trim();
+
+        if (!name) {
+          showMessage("Please enter your name.");
+          return;
         }
 
-        async function login() {
+        payload.name = name;
+      }
 
-            const email =
-                document.getElementById("email").value;
+      submitButton.disabled = true;
+      submitButton.textContent = isRegistering
+        ? "Creating account..."
+        : "Logging in...";
 
-            const password =
-                document.getElementById("password").value;
+      try {
+        const endpoint = isRegistering ? "/register" : "/login";
 
-            try {
+        const response = await fetch(API_URL + endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
 
-                const response = await fetch(
-                    "http://localhost:5000/login",
-                    {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            email,
-                            password
-                        })
-                    }
-                );
+        const data = await response.json();
 
-                const data = await response.json();
-
-                if (!response.ok) {
-
-                    alert(
-                        data.message || "Login Failed"
-                    );
-
-                    return;
-                }
-
-                localStorage.setItem(
-                    "token",
-                    data.token
-                );
-
-                alert("Login Successful");
-
-                window.location.href =
-                    "index.html";
-
-            } catch (error) {
-
-                console.log(error);
-
-                alert(
-                    "Server Error"
-                );
-            }
+        if (!response.ok) {
+          showMessage(data.message || "Something went wrong.");
+          return;
         }
 
-    </script>
+        if (isRegistering) {
+          showMessage(
+            "Account created! You can now log in.",
+            "success"
+          );
 
+          isRegistering = false;
+          form.reset();
+
+          nameInput.hidden = true;
+          nameInput.required = false;
+
+          heading.textContent = "Login";
+          subtitle.textContent =
+            "Sign in to manage your job applications.";
+          submitButton.textContent = "Login";
+          switchPrompt.textContent = "Don't have an account?";
+          switchLink.textContent = "Register";
+
+          passwordInput.autocomplete = "current-password";
+          return;
+        }
+
+        if (!data.token) {
+          showMessage("Login succeeded but no token was returned.");
+          return;
+        }
+
+        localStorage.setItem("token", data.token);
+        window.location.href = "index.html";
+
+      } catch (error) {
+        console.error("Authentication error:", error);
+
+        showMessage(
+          "Unable to reach the server. Please try again in a moment."
+        );
+      } finally {
+        submitButton.disabled = false;
+
+        if (submitButton.textContent === "Creating account..." ||
+            submitButton.textContent === "Logging in...") {
+          submitButton.textContent = isRegistering
+            ? "Create Account"
+            : "Login";
+        }
+      }
+    });
+  </script>
 </body>
-
 </html>
